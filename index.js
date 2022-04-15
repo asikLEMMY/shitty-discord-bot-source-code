@@ -1,4 +1,3 @@
-const { afk } = require('afk-cord');
 const {
     Client,
     Intents
