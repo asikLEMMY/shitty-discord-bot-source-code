@@ -65,7 +65,7 @@ bot.on("messageCreate", async message => {
         if (message.guild.me.permissions.has("BAN_MEMBERS")) {
         if (message.member.permissions.has("BAN_MEMBERS")) {
         let user = message.mentions.users.first();
-        let reason = message.content.slice((prefix + command + user + 1 + 1 + 1 + 1 + 1).length)
+        let reason = message.content.slice((prefix + command + user + 5).length)
         if(!user) return message.reply("$ban {User}, {Reason}");
         if(!reason) {
             reason = "non-reasoned.";
@@ -95,7 +95,7 @@ bot.on("messageCreate", async message => {
         if (message.guild.me.permissions.has("BAN_MEMBERS")) {
             if (message.member.permissions.has("KICK_MEMBERS")) {
             let user = message.mentions.users.first();
-            let reason = message.content.slice((prefix + command + user + 1 + 1 + 1 + 1 + 1).length)
+            let reason = message.content.slice((prefix + command + user + 5).length)
             if(!user) return message.reply("$kick {User}, {Reason}");
             if(!reason) {
                 reason = "non-reasoned.";
