@@ -3,19 +3,20 @@ const {
     Intents
 } = require('discord.js');
 const ms = require('ms')
-
-
+const ytdl = require("ytdl-core");
 const prefix = "m."
 const Discord = require('discord.js');
+const giphyRandom = require('giphy-js-sdk-core');
 const Canvas = require('canvas');
-
-
+const { joinVoiceChannel } = require('@discordjs/voice');
 
 
 const bot = new Client({
     intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGES]
 });
 
+
+const queue = new Map();
 const afkUsers = []
 
 bot.on("messageCreate", function(message) {
@@ -50,22 +51,85 @@ bot.on("messageCreate", async message => {
     const args = commandBody.split(' ');
     const command = args.shift().toLowerCase();
     if (command === "help") {
-        let commandList = ["ban (For Administrators.)", "kick (For Administrators.)", "avatar {User}", "afk", "duel"];
+		const row = new Discord.MessageActionRow()
+			.addComponents(
+				new Discord.MessageButton()
+					.setCustomId('roleplaying')
+					.setLabel('Roleplaying commands')
+					.setStyle('SECONDARY'),
+				new Discord.MessageButton()
+				    .setCustomId('admin')
+					.setLabel('Administrator commands')
+					.setStyle('SUCCESS'),
+				new Discord.MessageButton()
+				    .setCustomId('nsfw')
+					.setLabel('NSFW(+18) commands')
+					.setStyle('DANGER'),
+				new Discord.MessageButton()
+				    .setCustomId('general')
+					.setLabel('General commands')
+					.setStyle('SUCCESS'),
+		);
         let embed = new Discord.MessageEmbed()
         .setTitle("Help")
         .setColor('RANDOM')
+		.setDescription(
+		    '**Developer**: Vanitas#0405\n **Developing tool**: Visual Studio Code\n **Last update**: <t:1650479119:R>\n If you want to know about commands you should try the new buttons we assigned for it! '
+		)
         .setTimestamp(Date.now())
-        .setFields(
-            {name: "Commands (There is " + commandList.length + " available commands!)", value: commandList.join("\n")}
-        )
         .setFooter(`Requested by ${message.author.tag}`, `${message.author.displayAvatarURL()}`);
-        message.channel.send({content: ` `, embeds:[embed]});
+       let reply = await message.reply({content: ` `, embeds: [embed], components: [row]});
+	   let user = message.guild.members.cache.get(message.author.id)
+	   const collector = message.channel.createMessageComponentCollector({ reply, time: 15000 });
+	   collector.on('collect', async reply => {
+	    if (reply.customId === 'roleplaying') {
+		await reply.deferUpdate();
+		try {
+         await message.author.send('test');
+         message.channel.send(`Roleplaying commands sent to ${user.toString()}`);	
+		} catch (error) {
+			console.log(error)
+			message.channel.send(`I couldn't send message to ${user.toString()}`);
+        }
     }
-    else if (command === "ban") {
+       if (reply.customId === "admin") {
+        await reply.deferUpdate();
+		try {
+         await message.author.send('test');
+         message.channel.send(`Administrators commands sent to ${user.toString()}`);	
+		} catch (error) {
+			console.log(error)
+			message.channel.send(`I couldn't send message to ${user.toString()}`);
+        }
+       }
+       if (reply.customId === "nsfw") {
+        await reply.deferUpdate();
+		try {
+         await message.author.send('test');
+         message.channel.send(`NSFW(+18) commands sent to ${user.toString()}`);	
+		} catch (error) {
+			console.log(error)
+			message.channel.send(`I couldn't send message to ${user.toString()}`);
+        }
+       }
+       if (reply.customId === "general") {
+        await reply.deferUpdate();
+		try {
+         await message.author.send('test');
+         message.channel.send(`General commands sent to ${user.toString()}`);	
+		} catch (error) {
+			console.log(error)
+			message.channel.send(`I couldn't send message to ${user.toString()}`);
+        }
+       }
+});
+ collector.on('end', collected => console.log(`Collected ${collected.size} items`));
+}
+  else if (command === "ban") {
         if (message.guild.me.permissions.has("BAN_MEMBERS")) {
         if (message.member.permissions.has("BAN_MEMBERS")) {
         let user = message.mentions.users.first();
-        let reason = message.content.slice((prefix + command + user + 6).length)
+        let reason = message.content.slice((prefix + command + user + 1 + 1 + 1 + 1 + 1).length)
         if(!user) return message.reply("$ban {User}, {Reason}");
         if(!reason) {
             reason = "non-reasoned.";
@@ -95,7 +159,7 @@ bot.on("messageCreate", async message => {
         if (message.guild.me.permissions.has("BAN_MEMBERS")) {
             if (message.member.permissions.has("KICK_MEMBERS")) {
             let user = message.mentions.users.first();
-            let reason = message.content.slice((prefix + command + user + 6).length)
+            let reason = message.content.slice((prefix + command + user + 1 + 1 + 1 + 1 + 1).length)
             if(!user) return message.reply("$kick {User}, {Reason}");
             if(!reason) {
                 reason = "non-reasoned.";
@@ -132,6 +196,106 @@ bot.on("messageCreate", async message => {
         .setTimestamp(Date.now());
         message.channel.send({content: ` `, embeds:[embed]});
     }
+   else if (command === "kiss") {
+        let user = message.mentions.users.first();
+        if (!user) return message.reply("Nu uh, you can't kiss the air.")
+        let reason = message.content.slice((prefix + command + user + 5 * 1.65).length)
+        if (!reason) {
+            reason = " "
+        }
+        let author = message.guild.members.cache.get(message.author.id)
+        let member = message.guild.members.cache.get(user.id)
+        const API_KEY = "";
+        giphy = giphyRandom(API_KEY)
+        giphy.search('gifs', { q: 'anime kiss' }).then((response) => {
+        var totalResponses = response.data.length;
+        var responseIndex = Math.floor(Math.random() * 10 + 1) % totalResponses;
+        var responseFinal = response.data[responseIndex];
+        let embed = new Discord.MessageEmbed()
+        .setTitle(`*${author.displayName}* kisses *${member.displayName}*`)
+        .setImage(responseFinal.images.fixed_height.url)
+        .setDescription(reason)
+        .setColor('RED')
+        .setFooter(`Requested by ${message.author.tag}`, `${message.author.displayAvatarURL()}`)
+        .setTimestamp(Date.now());
+        message.channel.send({content: ` `, embeds:[embed]});
+        })
+    } 
+	else if (command === "hug") {
+		 let user = message.mentions.users.first();
+        if (!user) return message.reply("Nu uh, you can't hug the air.")
+        let reason = message.content.slice((prefix + command + user + 5 * 1.65).length)
+        if (!reason) {
+            reason = " "
+        }
+        let author = message.guild.members.cache.get(message.author.id)
+        let member = message.guild.members.cache.get(user.id)
+        const API_KEY = "";
+        giphy = giphyRandom(API_KEY)
+        giphy.search('gifs', { q: 'anime hug' }).then((response) => {
+        var totalResponses = response.data.length;
+        var responseIndex = Math.floor(Math.random() * 10 + 1) % totalResponses;
+        var responseFinal = response.data[responseIndex];
+        let embed = new Discord.MessageEmbed()
+        .setTitle(`*${author.displayName}* hugs *${member.displayName}*`)
+        .setImage(responseFinal.images.fixed_height.url)
+        .setDescription(reason)
+        .setColor('RED')
+        .setFooter(`Requested by ${message.author.tag}`, `${message.author.displayAvatarURL()}`)
+        .setTimestamp(Date.now());
+        message.channel.send({content: ` `, embeds:[embed]});
+        })
+	}
+		else if (command === "slap") {
+		 let user = message.mentions.users.first();
+        if (!user) return message.reply("Nu uh, you can't slap the air.")
+        let reason = message.content.slice((prefix + command + user + 5 * 1.65).length)
+        if (!reason) {
+            reason = " "
+        }
+        let author = message.guild.members.cache.get(message.author.id)
+        let member = message.guild.members.cache.get(user.id)
+        const API_KEY = "";
+        giphy = giphyRandom(API_KEY)
+        giphy.search('gifs', { q: 'anime slap' }).then((response) => {
+        var totalResponses = response.data.length;
+        var responseIndex = Math.floor(Math.random() * 10 + 1) % totalResponses;
+        var responseFinal = response.data[responseIndex];
+        let embed = new Discord.MessageEmbed()
+        .setTitle(`*${author.displayName}* slaps *${member.displayName}*`)
+        .setImage(responseFinal.images.fixed_height.url)
+        .setDescription(reason)
+        .setColor('RED')
+        .setFooter(`Requested by ${message.author.tag}`, `${message.author.displayAvatarURL()}`)
+        .setTimestamp(Date.now());
+        message.channel.send({content: ` `, embeds:[embed]});
+        })
+	}
+	else if (command === "cuddle") {
+		 let user = message.mentions.users.first();
+        if (!user) return message.reply("Nu uh, you can't cuddle the air.")
+        let reason = message.content.slice((prefix + command + user + 5 * 1.65).length)
+        if (!reason) {
+            reason = " "
+        }
+        let author = message.guild.members.cache.get(message.author.id)
+        let member = message.guild.members.cache.get(user.id)
+        const API_KEY = "8vFk1YYWMMDp849cYwxVfGVz8gQuPT97";
+        giphy = giphyRandom(API_KEY)
+        giphy.search('gifs', { q: 'anime cuddle' }).then((response) => {
+        var totalResponses = response.data.length;
+        var responseIndex = Math.floor(Math.random() * 10 + 1) % totalResponses;
+        var responseFinal = response.data[responseIndex];
+        let embed = new Discord.MessageEmbed()
+        .setTitle(`*${author.displayName}* cuddles *${member.displayName}*`)
+        .setImage(responseFinal.images.fixed_height.url)
+        .setDescription(reason)
+        .setColor('RED')
+        .setFooter(`Requested by ${message.author.tag}`, `${message.author.displayAvatarURL()}`)
+        .setTimestamp(Date.now());
+        message.channel.send({content: ` `, embeds:[embed]});
+        })
+	}
     else if (command === "afk") {
         let reason = message.content.slice((prefix + command).length)
         if (!reason) {
@@ -213,9 +377,7 @@ bot.on("messageCreate", async message => {
         }
      }
 });
-  
-
-
+    
 bot.on('ready', () => {
     console.log(`Bot ${bot.user.tag} is logged in!`);
     bot.user.setPresence({
