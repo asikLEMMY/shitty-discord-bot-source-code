@@ -280,7 +280,7 @@ bot.on("messageCreate", async message => {
         }
         let author = message.guild.members.cache.get(message.author.id)
         let member = message.guild.members.cache.get(user.id)
-        const API_KEY = "8vFk1YYWMMDp849cYwxVfGVz8gQuPT97";
+        const API_KEY = "";
         giphy = giphyRandom(API_KEY)
         giphy.search('gifs', { q: 'anime cuddle' }).then((response) => {
         var totalResponses = response.data.length;
